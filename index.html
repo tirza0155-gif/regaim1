@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רגעים שנשארים | מגנטים מהנייד, בלוקי עץ ומזכרות לאירועים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Rubik:wght@700;800;900&family=Varela+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Assistant', 'sans-serif'],
+                        display: ['Varela Round', 'sans-serif'],
+                        logo: ['Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: { rust: '#9E330C', light: '#FDFBF9', kraft: '#D8B89A' },
+                        peach: { 50: '#FCF8F5', 100: '#F7EFEA', 200: '#EDD9CE', 300: '#DFBBA8', 400: '#C98A6B' },
+                        plum: { 50: '#FBF6F3', 100: '#F5EAE3', 200: '#E8CFC1', 300: '#D5A992', 500: '#B84A22', 600: '#9E330C', 700: '#7D2607' },
+                        mint: { 50: '#F6F8F5', 100: '#EAEFE7', 200: '#D4DFCE', 300: '#B5C7AC', 600: '#556B4E', 700: '#3E5038' },
+                        classic: { bg: '#FDFBF9', border: '#E8DFD7', text: '#2C221E', muted: '#695A53' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #FDFBF9; color: #2C221E; scroll-behavior: smooth; }
+        .magnet-card {
+            box-shadow: 0 12px 24px -6px rgba(44, 34, 30, 0.12), 0 4px 8px -2px rgba(44, 34, 30, 0.06);
+            border: 6px solid #ffffff;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #ffffff;
+        }
+        .magnet-card:hover { transform: scale(1.02) rotate(0deg) !important; box-shadow: 0 20px 30px -10px rgba(44, 34, 30, 0.18); z-index: 20; }
+        .wood-card { box-shadow: 8px 10px 0px #d4b895, 0 15px 25px rgba(0,0,0,0.12); border: 3px solid #e8d5bc; transition: all 0.3s ease; }
+        .wood-card:hover { transform: translateY(-4px); box-shadow: 10px 14px 0px #c5a47e, 0 20px 30px rgba(0,0,0,0.16); }
+        .whatsapp-bubble { box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04); border-radius: 18px; position: relative; background-color: #ffffff; border-top-left-radius: 4px; }
+        .cat-card { transition: all 0.3s ease; }
+        .cat-card.active-cat { border-color: #9E330C; background-color: #F5EAE3; transform: translateY(-3px); box-shadow: 0 12px 20px -5px rgba(158, 51, 12, 0.18); }
+        .fade-in { animation: fadeIn 0.35s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #D5A992; border-radius: 9999px; }
+    </style>
+</head>
+<body class="antialiased selection:bg-peach-200 selection:text-classic-text">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-[#2C1D18] text-peach-100 text-center py-2.5 px-4 text-xs sm:text-sm font-medium tracking-wide">
+        ✨ כל הזמנה נארזת באהבה בנייר משי רך • איסוף עצמי מחיפה (0 ₪) או משלוח לכל הארץ ✨
+    </div>
+
+    <!-- Navigation with Rectangular Image Placeholder for Logo -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-classic-border shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- מלבן לשיבוץ תמונת הלוגו (מותאם לרקע הלבן של הלוגו החדש) -->
+                <label id="brand-logo-container" title="לחצו לבחירת תמונת לוגו" class="cursor-pointer w-36 sm:w-44 h-14 sm:h-16 rounded-xl border-2 border-dashed border-[#D5A992] bg-white hover:bg-peach-50 flex items-center justify-center overflow-hidden shrink-0 transition">
+                    <input type="file" accept="image/*" class="hidden" onchange="if(this.files[0]) setLogoImage(this.files[0])">
+                    <img id="header-logo-img" src="שנשארים_2.jpg" alt="רגעים שנשארים" class="w-full h-full object-contain hidden" onload="showLoadedLogo('header')" onerror="tryNextLogoFallback(this, 'header')">
+                    <span id="header-logo-placeholder" class="text-[11px] font-semibold text-plum-600 text-center px-2 leading-tight select-none">
+                        <i class="fa-regular fa-image block text-sm mb-0.5"></i>
+                        שיבוץ תמונת לוגו
+                    </span>
+                </label>
+
+                <a href="#" onclick="switchCategory('magnets'); return false;" class="hidden sm:block border-r border-classic-border pr-3 mr-1">
+                    <span class="block text-xs text-classic-muted font-semibold">נותנים חיות לתמונות מהנייד</span>
+                    <span class="block text-[11px] text-plum-600 font-medium">מגנטים • בלוקי עץ • מזכרות</span>
+                </a>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-2.5 font-semibold text-sm">
+                <button onclick="switchCategory('magnets')" id="nav-btn-magnets" class="px-4 py-2 rounded-full bg-plum-600 text-white transition">
+                    מגנטים מהנייד
+                </button>
+                <button onclick="switchCategory('wood')" id="nav-btn-wood" class="px-4 py-2 rounded-full text-classic-text hover:bg-peach-100 transition">
+                    הדפסה על בלוק עץ
+                </button>
+                <button onclick="switchCategory('souvenirs')" id="nav-btn-souvenirs" class="px-4 py-2 rounded-full text-classic-text hover:bg-mint-100 transition">
+                    מזכרות לאירועים
+                </button>
+            </nav>
+
+            <a href="#order-area" class="bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 sm:px-5 py-2.5 rounded-full text-sm shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-xs"></i>
+                <span>לסל והזמנה</span>
+                <span id="header-total-badge" class="bg-white text-plum-700 text-xs font-bold px-2 py-0.5 rounded-full">65 ₪</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- VISUAL CATEGORY SELECTOR -->
+    <section class="py-7 bg-gradient-to-b from-peach-50/80 to-classic-bg border-b border-classic-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-5">
+                <span class="text-xs font-semibold text-plum-700 bg-plum-100 px-3.5 py-1 rounded-full border border-plum-200">בחרו קטגוריה לצפייה והזמנה</span>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold text-classic-text mt-2">איזה רגעים תרצו להוציא לאור היום?</h2>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 sm:gap-6 max-w-4xl mx-auto">
+                <button onclick="switchCategory('magnets')" id="cat-card-magnets" class="cat-card active-cat text-right bg-white p-3 sm:p-5 rounded-3xl border-2 border-peach-200 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 cursor-pointer">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 border-2 border-white shadow-md bg-peach-100">
+                        <img data-media="2909" src="IMG_2909.jpg" alt="מגנטים מהנייד" class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-center sm:text-right">
+                        <span class="inline-block bg-plum-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-1">הכי פופולרי ★</span>
+                        <h3 class="font-display font-bold text-sm sm:text-lg text-classic-text leading-tight">מגנטים מהנייד</h3>
+                        <p class="hidden sm:block text-xs text-classic-muted mt-0.5">גודל גלויה 10×15 • הדפסה תרמית</p>
+                    </div>
+                </button>
+
+                <button onclick="switchCategory('wood')" id="cat-card-wood" class="cat-card text-right bg-white p-3 sm:p-5 rounded-3xl border-2 border-peach-200 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 cursor-pointer hover:border-plum-300">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 border-2 border-white shadow-md bg-mint-100">
+                        <img data-media="3436" src="IMG_3436.jpg" alt="בלוק עץ" class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-center sm:text-right">
+                        <span class="inline-block bg-mint-200 text-classic-text text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-1">הנחת סטים (3+)</span>
+                        <h3 class="font-display font-bold text-sm sm:text-lg text-classic-text leading-tight">הדפסה על בלוק עץ</h3>
+                        <p class="hidden sm:block text-xs text-classic-muted mt-0.5">פוטובלוק עץ מלא ב-3 גדלים</p>
+                    </div>
+                </button>
+
+                <button onclick="switchCategory('souvenirs')" id="cat-card-souvenirs" class="cat-card text-right bg-white p-3 sm:p-5 rounded-3xl border-2 border-peach-200 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 cursor-pointer hover:border-plum-300">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 border-2 border-white shadow-md bg-plum-100 flex items-center justify-center text-plum-600 text-2xl">
+                        <i class="fa-solid fa-scroll"></i>
+                    </div>
+                    <div class="text-center sm:text-right">
+                        <span class="inline-block bg-peach-200 text-classic-text text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-1">20+ יחידות</span>
+                        <h3 class="font-display font-bold text-sm sm:text-lg text-classic-text leading-tight">מזכרות לאירועים</h3>
+                        <p class="hidden sm:block text-xs text-classic-muted mt-0.5">תפילות וברכות עם הקדשה אישית</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- CATEGORY PAGE 1: MAGNETS FROM PHONE                                       -->
+    <!-- ========================================================================= -->
+    <div id="category-page-magnets" class="fade-in">
+        
+        <section class="relative overflow-hidden py-10 md:py-14 bg-gradient-to-b from-peach-100/50 via-plum-50/30 to-classic-bg">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 grid md:grid-cols-12 gap-10 items-center">
+                <div class="md:col-span-6 space-y-5 text-center md:text-right">
+                    <div class="inline-flex items-center gap-2 bg-mint-200/80 border border-mint-300 px-4 py-1.5 rounded-full text-classic-text text-xs sm:text-sm font-semibold shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-mint-700"></i>
+                        <span>תוך 2 דקות התמונות מהנייד הופכות לקיר של שמחה בבית</span>
+                    </div>
+
+                    <!-- Exact Locked-Width & Tight Line-Spacing Header with Heart -->
+                    <div class="flex justify-center md:justify-start">
+                        <h1 class="inline-flex flex-col items-start font-sans font-normal text-classic-text text-right" style="font-size: clamp(2.35rem, 4.8vw, 3.65rem);">
+                            <span class="block text-[0.51em] leading-[0.85] mb-[-0.04em]">
+                                בוחרים את התמונות
+                            </span>
+                            <span class="block text-[1em] leading-[0.86] whitespace-nowrap">
+                                שעושות טוב על הלב <span class="text-plum-600">♡</span>
+                            </span>
+                            <span class="w-full flex justify-between text-[0.58em] leading-[0.9] mt-[0.03em] whitespace-nowrap">
+                                <span>והופכים</span>
+                                <span>אותן</span>
+                                <span>לרגעים</span>
+                                <span>שנשארים.</span>
+                            </span>
+                        </h1>
+                    </div>
+
+                    <div class="bg-peach-100/90 border border-peach-200 p-5 rounded-2xl shadow-sm space-y-2.5 text-right">
+                        <p class="text-base sm:text-lg text-classic-text leading-relaxed font-normal">
+                            התמונות המרגשות של הילדים, החופשות והשמחות המשפחתיות נועדו להאיר את הבית. ב<strong>"רגעים שנשארים"</strong> אנחנו מדפיסים אותן ב<strong>הדפסה תרמית איכותית</strong> על מגנט גדול בגודל <strong>10×15 ס"מ (גודל גלויה מלאה – פי 2 ממגנט רגיל!)</strong> שמכניס אור וחיוך לבית בכל יום.
+                        </p>
+                        <div class="pt-2 border-t border-peach-200/90 space-y-1.5 text-xs sm:text-sm text-classic-text">
+                            <p class="font-bold text-plum-700">
+                                ✨ במוצרי פוטובלוק ומגנטים תוכלו לבחור ולהעלות מספר תמונות במקביל – בצורה פשוטה, מהירה ונוחה, בלי צורך להעלות כל תמונה בנפרד.
+                            </p>
+                            <p class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-check text-plum-600 text-xs"></i>
+                                <span><strong>הימנעו מטקסט או פרטים חשובים ממש בקצוות התמונה.</strong></span>
+                            </p>
+                            <p class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-check text-plum-600 text-xs"></i>
+                                <span><strong>הימנעו מלשלוח תמונות חשוכות או צילומי מסך – השתמשו בתמונות מוארות ואיכותיות.</strong></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="grid grid-cols-3 gap-2.5 text-center pt-1">
+                        <div class="bg-white border border-peach-200 p-2.5 rounded-xl shadow-sm">
+                            <span class="block font-bold text-xs sm:text-sm text-plum-700">פי 2 בגודל</span>
+                            <span class="text-[11px] text-classic-muted">10×15 ס"מ (גודל גלויה)</span>
+                        </div>
+                        <div class="bg-white border border-peach-200 p-2.5 rounded-xl shadow-sm">
+                            <span class="block font-bold text-xs sm:text-sm text-mint-700">הדפסה תרמית</span>
+                            <span class="text-[11px] text-classic-muted">צבעים חדים וגימור מבריק</span>
+                        </div>
+                        <div class="bg-white border border-peach-200 p-2.5 rounded-xl shadow-sm">
+                            <span class="block font-bold text-xs sm:text-sm text-classic-text">עטוף כמתנה</span>
+                            <span class="text-[11px] text-classic-muted">בנייר משי ומדבקת מותג</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-1">
+                        <a href="#order-area" class="w-full sm:w-auto bg-plum-600 hover:bg-plum-700 text-white text-base sm:text-lg font-semibold px-8 py-3.5 rounded-2xl shadow-md transition flex items-center justify-center gap-3">
+                            <i class="fa-regular fa-images"></i>
+                            <span>בחירה והעלאת תמונות</span>
+                        </a>
+                        <a href="#magnets-packages" class="w-full sm:w-auto bg-mint-100 hover:bg-mint-200 text-classic-text border border-mint-300 text-base sm:text-lg font-medium px-7 py-3.5 rounded-2xl shadow-sm transition flex items-center justify-center gap-2">
+                            <span>למחירון החבילות</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Visual Collage -->
+                <div class="md:col-span-6">
+                    <div class="bg-gradient-to-br from-peach-200/80 via-plum-100/70 to-mint-200/70 p-5 sm:p-6 rounded-3xl shadow-lg border border-peach-200">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="magnet-card rounded-2xl overflow-hidden transform -rotate-2 aspect-[3/4] relative">
+                                <img data-media="2909" src="IMG_2909.jpg" alt="" class="w-full h-full object-cover">
+                                <span class="absolute top-2.5 right-2.5 bg-peach-100 text-plum-700 w-7 h-7 rounded-full flex items-center justify-center shadow-sm">
+                                    <i class="fa-solid fa-heart text-xs"></i>
+                                </span>
+                            </div>
+                            <div class="magnet-card rounded-2xl overflow-hidden transform rotate-2 mt-4 aspect-[3/4] relative">
+                                <img data-media="3436" src="IMG_3436.jpg" alt="" class="w-full h-full object-cover">
+                                <span class="absolute top-2.5 right-2.5 bg-peach-100 text-plum-700 w-7 h-7 rounded-full flex items-center justify-center shadow-sm">
+                                    <i class="fa-solid fa-heart text-xs"></i>
+                                </span>
+                            </div>
+                            <div class="magnet-card rounded-2xl overflow-hidden transform rotate-1 -mt-2 aspect-[3/4] relative">
+                                <img data-media="2026" src="IMG_2026.jpg" alt="" class="w-full h-full object-cover">
+                                <span class="absolute top-2.5 right-2.5 bg-peach-100 text-plum-700 w-7 h-7 rounded-full flex items-center justify-center shadow-sm">
+                                    <i class="fa-solid fa-heart text-xs"></i>
+                                </span>
+                            </div>
+                            <div class="magnet-card rounded-2xl overflow-hidden transform -rotate-1 mt-2 aspect-[3/4] relative">
+                                <img data-media="2232" src="IMG_2232.jpg" alt="" class="w-full h-full object-cover">
+                                <span class="absolute top-2.5 right-2.5 bg-peach-100 text-plum-700 w-7 h-7 rounded-full flex items-center justify-center shadow-sm">
+                                    <i class="fa-solid fa-heart text-xs"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Magnets Packages Section -->
+        <section id="magnets-packages" class="py-14 bg-white border-y border-classic-border">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-2xl mx-auto mb-8">
+                    <span class="bg-plum-600 text-white font-semibold text-xs px-4 py-1.5 rounded-full inline-block mb-2 shadow-sm">גודל 10×15 ס"מ (גודל גלויה מלאה – פי 2 ממגנט רגיל!)</span>
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold text-classic-text mt-1">חבילות מגנטים בהדפסה תרמית</h2>
+                    <p class="text-classic-muted mt-2">מחיר למגנט בודד: 8 ₪ • בחרו חבילה וחסכו עד 150 ₪!</p>
+                </div>
+
+                <!-- Photo Guidelines Banner inside Magnets Packages Section -->
+                <div class="max-w-3xl mx-auto mb-10 bg-peach-100/90 border-2 border-peach-300 rounded-2xl p-4 sm:p-5 text-xs sm:text-sm text-classic-text space-y-2 shadow-sm">
+                    <p class="font-bold text-plum-700 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-camera text-plum-600"></i>
+                        <span>דגשים חשובים לבחירת תמונות למגנטים לתוצאה מושלמת:</span>
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-2.5 pt-1">
+                        <div class="bg-white/90 p-2.5 rounded-xl border border-peach-200 flex items-center gap-2">
+                            <i class="fa-solid fa-sun text-plum-600"></i>
+                            <span><strong>איכות התמונה:</strong> הימנעו מלשלוח תמונות חשוכות או צילומי מסך – השתמשו בתמונות איכותיות ומוארות.</span>
+                        </div>
+                        <div class="bg-white/90 p-2.5 rounded-xl border border-peach-200 flex items-center gap-2">
+                            <i class="fa-solid fa-crop-simple text-plum-600"></i>
+                            <span><strong>שוליים וקצוות:</strong> הימנעו מטקסט או פרטים חשובים ממש בקצוות התמונה.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-4 gap-6 items-stretch">
+                    <div class="bg-peach-50 rounded-3xl p-6 border-2 border-peach-200 flex flex-col justify-between text-center shadow-sm">
+                        <div>
+                            <span class="bg-white border border-peach-200 text-classic-text text-xs font-semibold px-3 py-1 rounded-full">בודדים</span>
+                            <h3 class="font-display text-2xl font-bold text-classic-text mt-3">מגנט בודד</h3>
+                            <div class="my-6 pb-6 border-b border-peach-200">
+                                <span class="text-4xl font-bold text-classic-text">8 ₪</span>
+                                <span class="text-classic-muted text-sm"> / ליחידה</span>
+                            </div>
+                            <p class="text-sm text-classic-text">גודל 10×15 ס"מ בהדפסה תרמית איכותית (1 עד 9 מגנטים)</p>
+                        </div>
+                        <button onclick="selectPackage(1)" class="mt-8 w-full py-3 rounded-xl bg-white border-2 border-plum-500 text-classic-text font-semibold hover:bg-plum-50 transition">בחירה</button>
+                    </div>
+
+                    <div class="bg-peach-100 rounded-3xl p-6 border-2 border-peach-300 flex flex-col justify-between text-center shadow-sm">
+                        <div>
+                            <span class="bg-white text-classic-text text-xs font-semibold px-3 py-1 rounded-full border border-peach-300">חבילה 1 • מתנה מושלמת</span>
+                            <h3 class="font-display text-2xl font-bold text-classic-text mt-3">10 מגנטים</h3>
+                            <div class="my-6 pb-6 border-b border-peach-300/70">
+                                <span class="text-4xl font-bold text-classic-text">65 ₪</span>
+                                <span class="text-sm text-classic-muted line-through block">80 ₪</span>
+                                <span class="inline-block mt-2 text-xs font-semibold text-classic-text bg-white px-3 py-1 rounded-full border border-peach-300">6.5 ₪ למגנט • חיסכון 15 ₪</span>
+                            </div>
+                            <p class="text-sm text-classic-text">10 מגנטים בגודל 10×15 ס"מ עטופים בנייר משי</p>
+                        </div>
+                        <button onclick="selectPackage(10)" class="mt-8 w-full py-3 rounded-xl bg-plum-600 text-white font-semibold hover:bg-plum-700 transition shadow-sm">בחירת חבילת 10</button>
+                    </div>
+
+                    <div class="bg-mint-100 rounded-3xl p-6 border-2 border-mint-300 shadow-lg flex flex-col justify-between text-center relative transform md:-translate-y-2">
+                        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-plum-600 text-white text-xs font-semibold px-4 py-1 rounded-full shadow-sm">הכי מבוקש ⭐</div>
+                        <div>
+                            <span class="bg-white text-classic-text text-xs font-semibold px-3 py-1 rounded-full border border-mint-300">חבילה 2</span>
+                            <h3 class="font-display text-2xl font-bold text-classic-text mt-3">25 מגנטים</h3>
+                            <div class="my-6 pb-6 border-b border-mint-300/80">
+                                <span class="text-4xl font-bold text-classic-text">135 ₪</span>
+                                <span class="text-sm text-classic-muted line-through block">200 ₪</span>
+                                <span class="inline-block mt-2 text-xs font-semibold text-classic-text bg-white px-3 py-1 rounded-full border border-mint-300">5.4 ₪ למגנט • חיסכון 65 ₪!</span>
+                            </div>
+                            <p class="text-sm text-classic-text">25 מגנטים בגודל 10×15 ס"מ • החבילה המשתלמת לבית</p>
+                        </div>
+                        <button onclick="selectPackage(25)" class="mt-8 w-full py-3.5 rounded-xl bg-plum-600 text-white font-semibold hover:bg-plum-700 shadow-md transition">בחירת חבילת 25</button>
+                    </div>
+
+                    <div class="bg-plum-100 rounded-3xl p-6 border-2 border-plum-300 flex flex-col justify-between text-center shadow-sm">
+                        <div>
+                            <span class="bg-white text-classic-text text-xs font-semibold px-3 py-1 rounded-full border border-plum-300">חבילה 3 • מקסימום חיסכון</span>
+                            <h3 class="font-display text-2xl font-bold text-classic-text mt-3">50 מגנטים</h3>
+                            <div class="my-6 pb-6 border-b border-plum-300/70">
+                                <span class="text-4xl font-bold text-classic-text">250 ₪</span>
+                                <span class="text-sm text-classic-muted line-through block">400 ₪</span>
+                                <span class="inline-block mt-2 text-xs font-semibold text-classic-text bg-white px-3 py-1 rounded-full border border-plum-300">5 ₪ למגנט • חיסכון 150 ₪!</span>
+                            </div>
+                            <p class="text-sm text-classic-text">50 מגנטים בגודל 10×15 ס"מ • קיר שלם של זיכרונות</p>
+                        </div>
+                        <button onclick="selectPackage(50)" class="mt-8 w-full py-3 rounded-xl bg-classic-text text-white font-semibold hover:bg-black transition shadow-sm">בחירת חבילת 50</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flowing Visual Showcase of Magnets -->
+        <section id="real-gallery" class="py-14 bg-classic-bg border-b border-classic-border">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-2xl mx-auto mb-10">
+                    <h2 class="font-display text-3xl font-bold text-classic-text">קיר של רגעים שנשארים בבית</h2>
+                    <p class="text-classic-muted mt-1">הדפסה תרמית חדה ומבריקה בגודל 10×15 ס"מ שהופכת כל דלת או מקרר לפינה הכי חמה בבית</p>
+                </div>
+
+                <div class="grid md:grid-cols-12 gap-6 items-stretch mb-6">
+                    <div class="md:col-span-7 magnet-card rounded-3xl overflow-hidden min-h-[340px]">
+                        <img data-media="2551" src="IMG_2551.jpg" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="md:col-span-5 magnet-card rounded-3xl overflow-hidden bg-gray-900 min-h-[340px]">
+                        <video data-media="2554" src="IMG_2554.MOV" poster="IMG_2551.jpg" class="w-full h-full object-cover" controls autoplay muted loop playsinline></video>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                    <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] transform -rotate-1">
+                        <img data-media="2909_2" src="IMG_2909_2.jpg" onerror="this.onerror=null;this.src='IMG_2909.jpg';" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] transform rotate-1">
+                        <img data-media="3436" src="IMG_3436.jpg" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] transform -rotate-1">
+                        <img data-media="2026_2" src="IMG_2026_2.jpg" onerror="this.onerror=null;this.src='IMG_2026.jpg';" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] transform rotate-1">
+                        <img data-media="2232_2" src="IMG_2232_2.jpg" onerror="this.onerror=null;this.src='IMG_2232.jpg';" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] transform -rotate-1">
+                        <img data-media="2551_2" src="IMG_2551_2.jpg" onerror="this.onerror=null;this.src='IMG_2551.jpg';" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] bg-gray-900 transform rotate-1">
+                        <video data-media="2554_2" src="IMG_2554_2.MOV" poster="IMG_2551.jpg" class="w-full h-full object-cover" autoplay muted loop playsinline controls></video>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- CATEGORY PAGE 2: WOOD BLOCKS                                              -->
+    <!-- ========================================================================= -->
+    <div id="category-page-wood" class="hidden fade-in">
+        <section class="py-14 bg-gradient-to-b from-peach-50/70 to-white border-b border-classic-border">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-2xl mx-auto mb-8">
+                    <span class="bg-peach-200 border border-peach-300 text-classic-text font-semibold text-xs px-4 py-1 rounded-full inline-block mb-2">קטגוריית פוטובלוק – עץ טבעי מלא ועבה</span>
+                    <h1 class="font-display text-3xl sm:text-5xl font-bold text-classic-text">הדפסת תמונות על בלוק עץ טבעי</h1>
+                    <p class="text-classic-muted mt-3 text-base sm:text-lg">
+                        הפכו את התמונות האהובות לפריט עיצוב חם שעומד בפני עצמו על מדף, שידה או שולחן עבודה. מתנה מרגשת לבית או למשרד.
+                    </p>
+                </div>
+
+                <!-- Quantity Discount Banner for Wood Blocks -->
+                <div class="max-w-3xl mx-auto mb-6 bg-mint-100 border-2 border-mint-300 rounded-2xl p-4 sm:p-5 text-center shadow-sm">
+                    <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-sm sm:text-base text-classic-text">
+                        <span class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-tags text-mint-700"></i>
+                            מבצע קומפוזיציה וסטים (בהזמנת 3 בלוקים ומעלה – ניתן לשלב גדלים!):
+                        </span>
+                        <span class="bg-plum-600 text-white px-4 py-1 rounded-full font-semibold text-xs sm:text-sm shadow-sm">
+                            6 ₪ עד 8 ₪ הנחה אוטומטית על כל בלוק!
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Photo Guidelines Banner inside Wood Blocks Category -->
+                <div class="max-w-3xl mx-auto mb-10 bg-peach-100/90 border border-peach-300 rounded-2xl p-4 text-xs sm:text-sm text-classic-text space-y-1.5">
+                    <p class="font-bold text-plum-700">
+                        ✨ במוצרי פוטובלוק ומגנטים תוכלו לבחור ולהעלות מספר תמונות במקביל – בצורה פשוטה, מהירה ונוחה, בלי צורך להעלות כל תמונה בנפרד.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-1">
+                        <span>• הימנעו מטקסט או פרטים חשובים ממש בקצוות התמונה</span>
+                        <span>• הימנעו מלשלוח תמונות חשוכות או צילומי מסך – השתמשו בתמונות איכותיות</span>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 items-stretch">
+                    <div class="bg-peach-100/80 rounded-3xl p-7 border-2 border-peach-200 flex flex-col justify-between text-center">
+                        <div>
+                            <div class="w-28 h-36 mx-auto mb-5 bg-white rounded-xl wood-card overflow-hidden flex items-center justify-center relative">
+                                <img data-media="2909" src="IMG_2909.jpg" alt="" class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 right-1 bg-white/90 text-[10px] font-bold px-1.5 py-0.5 rounded">10×15</span>
+                            </div>
+                            <span class="bg-white border border-peach-300 text-classic-text text-xs font-semibold px-3 py-1 rounded-full">גודל קלאסי</span>
+                            <h3 class="font-display text-2xl font-bold text-classic-text mt-3">בלוק עץ 10×15 ס"מ</h3>
+                            <div class="my-4">
+                                <span class="text-4xl font-bold text-classic-text">28 ₪</span>
+                                <span class="text-xs text-classic-muted"> / לבודד</span>
+                                <div class="mt-2 bg-white border border-peach-300 rounded-xl py-1.5 px-3 inline-block">
+                                    <span class="text-xs font-bold text-plum-700">בהזמנת 3+ בלוקים: רק 22 ₪ ליחידה!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-peach-200 flex items-center justify-between bg-white px-4 py-2.5 rounded-2xl border">
+                            <span class="text-sm font-semibold">כמות להזמנה:</span>
+                            <div class="flex items-center gap-3">
+                                <button onclick="changeWood('10x15', -1)" class="w-8 h-8 rounded-lg bg-peach-100 hover:bg-peach-200 font-bold">-</button>
+                                <span id="wood-qty-10x15" class="font-bold text-lg w-5 text-center">0</span>
+                                <button onclick="changeWood('10x15', 1)" class="w-8 h-8 rounded-lg bg-plum-600 text-white hover:bg-plum-700 font-bold">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-mint-100/90 rounded-3xl p-7 border-2 border-mint-300 flex flex-col justify-between text-center shadow-md relative">
+                        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-plum-600 text-white text-xs font-semibold px-4 py-1 rounded-full shadow-sm">מושלם לסטים ⭐</div>
+                        <div>
+                            <div class="w-32 h-32 mx-auto mb-5 mt-2 bg-white rounded-xl wood-card overflow-hidden flex items-center justify-center relative">
+                                <img data-media="3436" src="IMG_3436.jpg" alt="" class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 right-1 bg-white/90 text-[10px] font-bold px-1.5 py-0.5 rounded">15×15</span>
+                            </div>
+                            <span class="bg-white border border-mint-300 text-classic-text text-xs font-semibold px-3 py-1 rounded-full">בלוק מרובע מעוצב</span>
+                            <h3 class="font-display text-2xl font-bold text-classic-text mt-3">בלוק עץ 15×15 ס"מ</h3>
+                            <div class="my-4">
+                                <span class="text-4xl font-bold text-classic-text">38 ₪</span>
+                                <span class="text-xs text-classic-muted"> / לבודד</span>
+                                <div class="mt-2 bg-white border border-mint-300 rounded-xl py-1.5 px-3 inline-block">
+                                    <span class="text-xs font-bold text-mint-700">בהזמנת 3+ בלוקים: רק 32 ₪ ליחידה!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-mint-200 flex items-center justify-between bg-white px-4 py-2.5 rounded-2xl border">
+                            <span class="text-sm font-semibold">כמות להזמנה:</span>
+                            <div class="flex items-center gap-3">
+                                <button onclick="changeWood('15x15', -1)" class="w-8 h-8 rounded-lg bg-mint-100 hover:bg-mint-200 font-bold">-</button>
+                                <span id="wood-qty-15x15" class="font-bold text-lg w-5 text-center">0</span>
+                                <button onclick="changeWood('15x15', 1)" class="w-8 h-8 rounded-lg bg-plum-600 text-white hover:bg-plum-700 font-bold">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-plum-100/80 rounded-3xl p-7 border-2 border-plum-200 flex flex-col justify-between text-center">
+                        <div>
+                            <div class="w-32 h-40 mx-auto mb-3 bg-white rounded-xl wood-card overflow-hidden flex items-center justify-center relative">
+                                <img data-media="2026" src="IMG_2026.jpg" alt="" class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 right-1 bg-white/90 text-[10px] font-bold px-1.5 py-0.5 rounded">15×20</span>
+                            </div>
+                            <span class="bg-white border border-plum-300 text-classic-text text-xs font-semibold px-3 py-1 rounded-full">גודל מוגדל ומרשים</span>
+                            <h3 class="font-display text-2xl font-bold text-classic-text mt-3">בלוק עץ 15×20 ס"מ</h3>
+                            <div class="my-4">
+                                <span class="text-4xl font-bold text-classic-text">48 ₪</span>
+                                <span class="text-xs text-classic-muted"> / לבודד</span>
+                                <div class="mt-2 bg-white border border-plum-300 rounded-xl py-1.5 px-3 inline-block">
+                                    <span class="text-xs font-bold text-plum-700">בהזמנת 3+ בלוקים: רק 40 ₪ ליחידה!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-plum-200 flex items-center justify-between bg-white px-4 py-2.5 rounded-2xl border">
+                            <span class="text-sm font-semibold">כמות להזמנה:</span>
+                            <div class="flex items-center gap-3">
+                                <button onclick="changeWood('15x20', -1)" class="w-8 h-8 rounded-lg bg-plum-100 hover:bg-plum-200 font-bold">-</button>
+                                <span id="wood-qty-15x20" class="font-bold text-lg w-5 text-center">0</span>
+                                <button onclick="changeWood('15x20', 1)" class="w-8 h-8 rounded-lg bg-plum-600 text-white hover:bg-plum-700 font-bold">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 text-center">
+                    <a href="#order-area" class="inline-flex items-center gap-2 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-md transition">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>המשיכו להעלאת התמונות לבלוקים בתחתית העמוד</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- CATEGORY PAGE 3: EVENT SOUVENIRS                                          -->
+    <!-- ========================================================================= -->
+    <div id="category-page-souvenirs" class="hidden fade-in">
+        <section class="py-14 bg-classic-bg border-b border-classic-border">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-2xl mx-auto mb-8">
+                    <span class="bg-plum-100 border border-plum-200 text-classic-text font-semibold text-xs px-4 py-1 rounded-full inline-block mb-2">קטגוריית מזכרות לאירועים ושמחות (מחבילות של 20 יחידות ומעלה)</span>
+                    <h1 class="font-display text-3xl sm:text-5xl font-bold text-classic-text">מגנטים מעוצבים של תפילות וברכות</h1>
+                    <p class="text-classic-muted mt-3 text-base sm:text-lg">
+                        מזכרת מרגשת, שימושית ומכובדת לחלוקה בשבתות חתן, בר/בת מצווה, בריתות והפרשת חלה – כולל הוספת הקדשה אישית לשמחה שלכם.
+                    </p>
+                </div>
+
+                <div class="max-w-3xl mx-auto mb-10 space-y-4">
+                    <div class="bg-peach-100 border-2 border-peach-300 rounded-2xl p-4 sm:p-5 text-center shadow-sm">
+                        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-classic-text">
+                            <span class="font-bold"><i class="fa-solid fa-gift text-plum-600 ml-1"></i> מחירון חבילות לאירועים (מינימום 20 יח'):</span>
+                            <span class="bg-white px-3.5 py-1.5 rounded-full border border-peach-300 font-semibold">
+                                20–49 יחידות: <strong>6 ₪ ליחידה</strong> (20 יח' ב-120 ₪)
+                            </span>
+                            <span class="bg-plum-600 text-white px-3.5 py-1.5 rounded-full font-semibold shadow-sm">
+                                חבילת 50 יחידות ומעלה: <strong>4.8 ₪ ליחידה!</strong> (50 יח' ב-240 ₪)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-mint-100 border-2 border-mint-300 rounded-2xl p-4 sm:p-5 text-center shadow-sm">
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm sm:text-base text-classic-text">
+                            <div class="w-10 h-10 rounded-full bg-white text-mint-700 flex items-center justify-center shrink-0 shadow-sm border border-mint-300">
+                                <i class="fa-brands fa-whatsapp text-xl"></i>
+                            </div>
+                            <p class="font-medium leading-relaxed">
+                                <strong>איך מוסיפים הקדשה אישית למגנט?</strong><br>
+                                כתבו לנו ב<strong>שדה ההערות</strong> בתחתית העמוד את נוסח ההקדשה שאתם רוצים שיהיה רשום על המגנט – ואנחנו נשלח אליכם <strong>סקיצה בוואטסאפ לאישור שלכם לפני ההדפסה!</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+                    <!-- Souvenir 1 -->
+                    <div class="bg-peach-100/70 rounded-3xl p-5 border-2 border-peach-200 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] relative mb-4 bg-gradient-to-b from-peach-50 to-white flex flex-col items-center justify-center p-6 text-center">
+                                <div class="absolute top-3 left-3 right-3 flex justify-between items-center z-10">
+                                    <span class="bg-plum-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow">20 יח' ב-120 ₪</span>
+                                    <span class="bg-mint-200 text-classic-text font-bold text-xs px-3 py-1 rounded-full shadow border border-mint-300">50 יח' ב-240 ₪</span>
+                                </div>
+                                <div class="border-2 border-peach-200 rounded-xl p-5 pt-8 w-full h-full flex flex-col items-center justify-center bg-white/80">
+                                    <i class="fa-solid fa-scroll text-plum-600 text-2xl mb-2"></i>
+                                    <h4 class="font-display text-2xl font-bold text-classic-text mb-2">מזמור לתודה</h4>
+                                    <p class="text-xs text-classic-muted leading-relaxed">"מִזְמוֹר לְתוֹדָה הָרִיעוּ לַיהוָה כָּל הָאָרֶץ... בֹּאוּ שְׁעָרָיו בְּתוֹדָה חֲצֵרֹתָיו בִּתְהִלָּה הוֹדוּ לוֹ בָּרְכוּ שְׁמוֹ..."</p>
+                                    <span class="mt-4 text-[11px] text-plum-700 font-semibold border-t border-peach-200 pt-2 w-full">כתבו בהערות את ההקדשה – נשלח לאישור בוואטסאפ לפני הדפסה</span>
+                                </div>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-classic-text text-center">מגנט מזמור לתודה</h3>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                <button onclick="setSouvenirPkg('מזמור לתודה', 20)" class="py-1.5 rounded-lg bg-white border border-peach-300 hover:bg-peach-50 font-semibold">20 יח' (120₪)</button>
+                                <button onclick="setSouvenirPkg('מזמור לתודה', 30)" class="py-1.5 rounded-lg bg-white border border-peach-300 hover:bg-peach-50 font-semibold">30 יח' (180₪)</button>
+                                <button onclick="setSouvenirPkg('מזמור לתודה', 50)" class="py-1.5 rounded-lg bg-plum-100 border border-plum-300 text-plum-700 font-bold">50 יח' (240₪)</button>
+                            </div>
+                            <div class="flex items-center justify-between bg-white px-4 py-2 rounded-2xl border border-peach-200">
+                                <span class="text-xs font-semibold">כמות (מינ' 20):</span>
+                                <div class="flex items-center gap-2.5">
+                                    <button onclick="stepSouvenir('מזמור לתודה', -10)" class="w-7 h-7 rounded bg-peach-100 font-bold">-10</button>
+                                    <span id="souv-qty-מזמור לתודה" class="font-bold text-base w-8 text-center">0</span>
+                                    <button onclick="stepSouvenir('מזמור לתודה', 10)" class="w-7 h-7 rounded bg-plum-600 text-white font-bold">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Souvenir 2 -->
+                    <div class="bg-plum-100/70 rounded-3xl p-5 border-2 border-plum-200 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] relative mb-4 bg-gradient-to-b from-plum-50 to-white flex flex-col items-center justify-center p-6 text-center">
+                                <div class="absolute top-3 left-3 right-3 flex justify-between items-center z-10">
+                                    <span class="bg-plum-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow">20 יח' ב-120 ₪</span>
+                                    <span class="bg-mint-200 text-classic-text font-bold text-xs px-3 py-1 rounded-full shadow border border-mint-300">50 יח' ב-240 ₪</span>
+                                </div>
+                                <div class="border-2 border-plum-200 rounded-xl p-5 pt-8 w-full h-full flex flex-col items-center justify-center bg-white/80">
+                                    <i class="fa-solid fa-wheat-awn text-plum-600 text-2xl mb-2"></i>
+                                    <h4 class="font-display text-2xl font-bold text-classic-text mb-2">סדר הפרשת חלה</h4>
+                                    <p class="text-xs text-classic-muted leading-relaxed">ברכת הפרשת חלה ותפילה מרגשת לאחר ההפרשה, בעיצוב נקי ויוקרתי המתאים לתלייה במטבח.</p>
+                                    <span class="mt-4 text-[11px] text-plum-700 font-semibold border-t border-plum-200 pt-2 w-full">כתבו בהערות את ההקדשה – נשלח לאישור בוואטסאפ לפני הדפסה</span>
+                                </div>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-classic-text text-center">מגנט סדר הפרשת חלה</h3>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                <button onclick="setSouvenirPkg('סדר הפרשת חלה', 20)" class="py-1.5 rounded-lg bg-white border border-plum-300 hover:bg-plum-50 font-semibold">20 יח' (120₪)</button>
+                                <button onclick="setSouvenirPkg('סדר הפרשת חלה', 30)" class="py-1.5 rounded-lg bg-white border border-plum-300 hover:bg-plum-50 font-semibold">30 יח' (180₪)</button>
+                                <button onclick="setSouvenirPkg('סדר הפרשת חלה', 50)" class="py-1.5 rounded-lg bg-plum-200 border border-plum-300 text-classic-text font-bold">50 יח' (240₪)</button>
+                            </div>
+                            <div class="flex items-center justify-between bg-white px-4 py-2 rounded-2xl border border-plum-200">
+                                <span class="text-xs font-semibold">כמות (מינ' 20):</span>
+                                <div class="flex items-center gap-2.5">
+                                    <button onclick="stepSouvenir('סדר הפרשת חלה', -10)" class="w-7 h-7 rounded bg-plum-100 font-bold">-10</button>
+                                    <span id="souv-qty-סדר הפרשת חלה" class="font-bold text-base w-8 text-center">0</span>
+                                    <button onclick="stepSouvenir('סדר הפרשת חלה', 10)" class="w-7 h-7 rounded bg-plum-600 text-white font-bold">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Souvenir 3 -->
+                    <div class="bg-mint-100/70 rounded-3xl p-5 border-2 border-mint-200 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] relative mb-4 bg-gradient-to-b from-mint-50 to-white flex flex-col items-center justify-center p-6 text-center">
+                                <div class="absolute top-3 left-3 right-3 flex justify-between items-center z-10">
+                                    <span class="bg-plum-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow">20 יח' ב-120 ₪</span>
+                                    <span class="bg-mint-200 text-classic-text font-bold text-xs px-3 py-1 rounded-full shadow border border-mint-300">50 יח' ב-240 ₪</span>
+                                </div>
+                                <div class="border-2 border-mint-200 rounded-xl p-5 pt-8 w-full h-full flex flex-col items-center justify-center bg-white/80">
+                                    <i class="fa-solid fa-bread-slice text-mint-700 text-2xl mb-2"></i>
+                                    <h4 class="font-display text-2xl font-bold text-classic-text mb-2">ברכת המזון / מעין שלוש</h4>
+                                    <p class="text-xs text-classic-muted leading-relaxed">ברכת המזון או ברכת מעין שלוש בכתב מאיר עיניים, מזכרת נפלאה לשבתות חתן, בר מצווה ושמחות.</p>
+                                    <span class="mt-4 text-[11px] text-mint-700 font-semibold border-t border-mint-200 pt-2 w-full">כתבו בהערות את ההקדשה – נשלח לאישור בוואטסאפ לפני הדפסה</span>
+                                </div>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-classic-text text-center">מגנט ברכת המזון / מעין שלוש</h3>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                <button onclick="setSouvenirPkg('ברכת המזון', 20)" class="py-1.5 rounded-lg bg-white border border-mint-300 hover:bg-mint-50 font-semibold">20 יח' (120₪)</button>
+                                <button onclick="setSouvenirPkg('ברכת המזון', 30)" class="py-1.5 rounded-lg bg-white border border-mint-300 hover:bg-mint-50 font-semibold">30 יח' (180₪)</button>
+                                <button onclick="setSouvenirPkg('ברכת המזון', 50)" class="py-1.5 rounded-lg bg-plum-100 border border-plum-300 text-plum-700 font-bold">50 יח' (240₪)</button>
+                            </div>
+                            <div class="flex items-center justify-between bg-white px-4 py-2 rounded-2xl border border-mint-200">
+                                <span class="text-xs font-semibold">כמות (מינ' 20):</span>
+                                <div class="flex items-center gap-2.5">
+                                    <button onclick="stepSouvenir('ברכת המזון', -10)" class="w-7 h-7 rounded bg-mint-100 font-bold">-10</button>
+                                    <span id="souv-qty-ברכת המזון" class="font-bold text-base w-8 text-center">0</span>
+                                    <button onclick="stepSouvenir('ברכת המזון', 10)" class="w-7 h-7 rounded bg-plum-600 text-white font-bold">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Souvenir 4 -->
+                    <div class="bg-peach-100/70 rounded-3xl p-5 border-2 border-peach-200 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] relative mb-4 bg-gradient-to-b from-peach-50 to-white flex flex-col items-center justify-center p-6 text-center">
+                                <div class="absolute top-3 left-3 right-3 flex justify-between items-center z-10">
+                                    <span class="bg-plum-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow">20 יח' ב-120 ₪</span>
+                                    <span class="bg-mint-200 text-classic-text font-bold text-xs px-3 py-1 rounded-full shadow border border-mint-300">50 יח' ב-240 ₪</span>
+                                </div>
+                                <div class="border-2 border-peach-200 rounded-xl p-5 pt-8 w-full h-full flex flex-col items-center justify-center bg-white/80">
+                                    <i class="fa-solid fa-fire-flame-simple text-plum-600 text-2xl mb-2"></i>
+                                    <h4 class="font-display text-2xl font-bold text-classic-text mb-2">סדר הדלקת נרות שבת</h4>
+                                    <p class="text-xs text-classic-muted leading-relaxed">ברכת הדלקת נרות ותפילת "יהי רצון" על הבנים והמשפחה לאחר ההדלקה.</p>
+                                    <span class="mt-4 text-[11px] text-plum-700 font-semibold border-t border-peach-200 pt-2 w-full">כתבו בהערות את ההקדשה – נשלח לאישור בוואטסאפ לפני הדפסה</span>
+                                </div>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-classic-text text-center">מגנט הדלקת נרות שבת</h3>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                <button onclick="setSouvenirPkg('הדלקת נרות שבת', 20)" class="py-1.5 rounded-lg bg-white border border-peach-300 hover:bg-peach-50 font-semibold">20 יח' (120₪)</button>
+                                <button onclick="setSouvenirPkg('הדלקת נרות שבת', 30)" class="py-1.5 rounded-lg bg-white border border-peach-300 hover:bg-peach-50 font-semibold">30 יח' (180₪)</button>
+                                <button onclick="setSouvenirPkg('הדלקת נרות שבת', 50)" class="py-1.5 rounded-lg bg-plum-100 border border-plum-300 text-plum-700 font-bold">50 יח' (240₪)</button>
+                            </div>
+                            <div class="flex items-center justify-between bg-white px-4 py-2 rounded-2xl border border-peach-200">
+                                <span class="text-xs font-semibold">כמות (מינ' 20):</span>
+                                <div class="flex items-center gap-2.5">
+                                    <button onclick="stepSouvenir('הדלקת נרות שבת', -10)" class="w-7 h-7 rounded bg-peach-100 font-bold">-10</button>
+                                    <span id="souv-qty-הדלקת נרות שבת" class="font-bold text-base w-8 text-center">0</span>
+                                    <button onclick="stepSouvenir('הדלקת נרות שבת', 10)" class="w-7 h-7 rounded bg-plum-600 text-white font-bold">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Souvenir 5 -->
+                    <div class="bg-plum-100/70 rounded-3xl p-5 border-2 border-plum-200 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] relative mb-4 bg-gradient-to-b from-plum-50 to-white flex flex-col items-center justify-center p-6 text-center">
+                                <div class="absolute top-3 left-3 right-3 flex justify-between items-center z-10">
+                                    <span class="bg-plum-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow">20 יח' ב-120 ₪</span>
+                                    <span class="bg-mint-200 text-classic-text font-bold text-xs px-3 py-1 rounded-full shadow border border-mint-300">50 יח' ב-240 ₪</span>
+                                </div>
+                                <div class="border-2 border-plum-200 rounded-xl p-5 pt-8 w-full h-full flex flex-col items-center justify-center bg-white/80">
+                                    <i class="fa-solid fa-house-chimney-heart text-plum-600 text-2xl mb-2"></i>
+                                    <h4 class="font-display text-2xl font-bold text-classic-text mb-2">ברכת הבית / אשר יצר</h4>
+                                    <p class="text-xs text-classic-muted leading-relaxed">ברכת הבית או ברכת אשר יצר בעיצוב אלגנטי לתלייה על דלת הבית או המקרר.</p>
+                                    <span class="mt-4 text-[11px] text-plum-700 font-semibold border-t border-plum-200 pt-2 w-full">כתבו בהערות את ההקדשה – נשלח לאישור בוואטסאפ לפני הדפסה</span>
+                                </div>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-classic-text text-center">מגנט ברכת הבית / אשר יצר</h3>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                <button onclick="setSouvenirPkg('ברכת הבית', 20)" class="py-1.5 rounded-lg bg-white border border-plum-300 hover:bg-plum-50 font-semibold">20 יח' (120₪)</button>
+                                <button onclick="setSouvenirPkg('ברכת הבית', 30)" class="py-1.5 rounded-lg bg-white border border-plum-300 hover:bg-plum-50 font-semibold">30 יח' (180₪)</button>
+                                <button onclick="setSouvenirPkg('ברכת הבית', 50)" class="py-1.5 rounded-lg bg-plum-200 border border-plum-300 text-classic-text font-bold">50 יח' (240₪)</button>
+                            </div>
+                            <div class="flex items-center justify-between bg-white px-4 py-2 rounded-2xl border border-plum-200">
+                                <span class="text-xs font-semibold">כמות (מינ' 20):</span>
+                                <div class="flex items-center gap-2.5">
+                                    <button onclick="stepSouvenir('ברכת הבית', -10)" class="w-7 h-7 rounded bg-plum-100 font-bold">-10</button>
+                                    <span id="souv-qty-ברכת הבית" class="font-bold text-base w-8 text-center">0</span>
+                                    <button onclick="stepSouvenir('ברכת הבית', 10)" class="w-7 h-7 rounded bg-plum-600 text-white font-bold">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Souvenir 6 -->
+                    <div class="bg-mint-100/70 rounded-3xl p-5 border-2 border-mint-200 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="magnet-card rounded-2xl overflow-hidden aspect-[3/4] relative mb-4 bg-gradient-to-b from-mint-50 to-white flex flex-col items-center justify-center p-6 text-center">
+                                <div class="absolute top-3 left-3 right-3 flex justify-between items-center z-10">
+                                    <span class="bg-plum-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow">20 יח' ב-120 ₪</span>
+                                    <span class="bg-mint-200 text-classic-text font-bold text-xs px-3 py-1 rounded-full shadow border border-mint-300">50 יח' ב-240 ₪</span>
+                                </div>
+                                <div class="border-2 border-mint-200 rounded-xl p-5 pt-8 w-full h-full flex flex-col items-center justify-center bg-white/80">
+                                    <i class="fa-solid fa-star-of-david text-mint-700 text-2xl mb-2"></i>
+                                    <h4 class="font-display text-2xl font-bold text-classic-text mb-2">תפילה בבחירה אישית</h4>
+                                    <p class="text-xs text-classic-muted leading-relaxed">נשמת כל חי, שיר השירים, אשת חיל, תפילת הדרך או כל תפילה ומזכרת בהתאמה אישית לאירוע שלכם.</p>
+                                    <span class="mt-4 text-[11px] text-mint-700 font-semibold border-t border-mint-200 pt-2 w-full">כתבו בהערות את ההקדשה – נשלח לאישור בוואטסאפ לפני הדפסה</span>
+                                </div>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-classic-text text-center">מזכרת בהתאמה אישית</h3>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                <button onclick="setSouvenirPkg('תפילה בהתאמה אישית', 20)" class="py-1.5 rounded-lg bg-white border border-mint-300 hover:bg-mint-50 font-semibold">20 יח' (120₪)</button>
+                                <button onclick="setSouvenirPkg('תפילה בהתאמה אישית', 30)" class="py-1.5 rounded-lg bg-white border border-mint-300 hover:bg-mint-50 font-semibold">30 יח' (180₪)</button>
+                                <button onclick="setSouvenirPkg('תפילה בהתאמה אישית', 50)" class="py-1.5 rounded-lg bg-plum-100 border border-plum-300 text-plum-700 font-bold">50 יח' (240₪)</button>
+                            </div>
+                            <div class="flex items-center justify-between bg-white px-4 py-2 rounded-2xl border border-mint-200">
+                                <span class="text-xs font-semibold">כמות (מינ' 20):</span>
+                                <div class="flex items-center gap-2.5">
+                                    <button onclick="stepSouvenir('תפילה בהתאמה אישית', -10)" class="w-7 h-7 rounded bg-mint-100 font-bold">-10</button>
+                                    <span id="souv-qty-תפילה בהתאמה אישית" class="font-bold text-base w-8 text-center">0</span>
+                                    <button onclick="stepSouvenir('תפילה בהתאמה אישית', 10)" class="w-7 h-7 rounded bg-plum-600 text-white font-bold">+10</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- UNBOXING EXPERIENCE BANNER                                                -->
+    <!-- ========================================================================= -->
+    <section class="py-8 bg-gradient-to-r from-peach-100/80 via-plum-100/60 to-mint-100/80 border-b border-classic-border">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-white text-plum-600 flex items-center justify-center text-xl shadow-sm border border-plum-200 shrink-0">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-lg text-classic-text">ארוז כמתנה מרגשת בכל הזמנה 🎁</h3>
+                    <p class="text-xs sm:text-sm text-classic-muted">כל הזמנה נארזת ידנית בנייר משי רך עם מדבקת "רגעים שנשארים" – מוכנה לתלייה בבית או להענקה כמתנה מושלמת לסבא, סבתא ואהובים.</p>
+                </div>
+            </div>
+            <span class="bg-white text-plum-600 font-bold text-xs px-4 py-2 rounded-full border border-plum-200 shrink-0 shadow-sm">ללא תוספת תשלום</span>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SHARED SECTION: UNIFIED CHECKOUT                                          -->
+    <!-- ========================================================================= -->
+    <section id="order-area" class="py-14 bg-peach-50/60">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="bg-white border-2 border-peach-200 rounded-3xl p-6 sm:p-10 shadow-md">
+                <div class="text-center max-w-2xl mx-auto mb-6">
+                    <h2 class="font-display text-3xl font-bold text-classic-text">העלאת תמונות וסיכום הזמנה</h2>
+                    <p class="text-classic-text text-sm sm:text-base mt-2 font-medium">
+                        במוצרי פוטובלוק ומגנטים תוכלו לבחור ולהעלות מספר תמונות במקביל – בצורה פשוטה, מהירה ונוחה, בלי צורך להעלות כל תמונה בנפרד.
+                    </p>
+                </div>
+
+                <!-- Upload Dropzone -->
+                <div class="mb-5">
+                    <label for="photo-upload" class="cursor-pointer group block border-2 border-dashed border-plum-300 bg-gradient-to-b from-peach-100/70 to-plum-100/50 hover:from-peach-100 hover:to-plum-100 rounded-3xl p-8 text-center transition">
+                        <div class="w-16 h-16 rounded-2xl bg-white border border-plum-200 text-plum-600 flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-105 transition shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-classic-text">לחצו כאן לבחירת תמונות מהנייד (ניתן לבחור מספר תמונות יחד)</h3>
+                        <p class="text-sm text-classic-text mt-1">טיפ מהיר: היכנסו לתיקיית "מועדפים" (Favorites) בגלריה וסמנו את כל התמונות יחד</p>
+                        <div class="mt-4 inline-flex items-center gap-2 bg-plum-600 text-white font-semibold px-6 py-2.5 rounded-full text-sm shadow-sm">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            <span>בחירת תמונות מהמכשיר</span>
+                        </div>
+                        <input id="photo-upload" type="file" multiple accept="image/*" class="hidden" onchange="handleCustomerUpload(this.files)">
+                    </label>
+                </div>
+
+                <!-- Photo Quality & Margin Tips Box -->
+                <div class="mb-6 bg-peach-100/80 border border-peach-300 rounded-2xl p-4 sm:p-5">
+                    <h4 class="font-display font-bold text-sm sm:text-base text-classic-text mb-2.5 flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-plum-600"></i>
+                        <span>דגשים חשובים לתמונות:</span>
+                    </h4>
+                    <ul class="grid sm:grid-cols-2 gap-3 text-xs sm:text-sm text-classic-text font-medium">
+                        <li class="flex items-center gap-2 bg-white p-3 rounded-xl border border-peach-200 shadow-sm">
+                            <i class="fa-solid fa-crop-simple text-plum-600"></i>
+                            <span>הימנעו מטקסט או פרטים חשובים ממש בקצוות התמונה</span>
+                        </li>
+                        <li class="flex items-center gap-2 bg-white p-3 rounded-xl border border-peach-200 shadow-sm">
+                            <i class="fa-solid fa-sun text-plum-600"></i>
+                            <span>השתמשו בתמונות איכותיות, לא צילומי מסך או תמונות כהות</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Dynamic Tier Banner -->
+                <div class="mb-6 bg-mint-100 border-2 border-mint-300 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <span id="upsell-text" class="text-sm font-medium text-classic-text"></span>
+                    <span id="tier-badge" class="text-xs font-semibold bg-white px-3.5 py-1.5 rounded-full border border-mint-300 text-classic-text shrink-0 shadow-sm"></span>
+                </div>
+
+                <!-- Preview of Customer Uploaded Photos -->
+                <div id="preview-container" class="hidden mb-8">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-bold text-sm text-classic-text">התמונות שנבחרו להדפסה:</span>
+                        <button onclick="clearCustomerPhotos()" class="text-xs text-plum-600 font-semibold hover:underline">נקה הכל</button>
+                    </div>
+                    <div id="photos-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-h-80 overflow-y-auto p-2 custom-scrollbar"></div>
+                </div>
+
+                <!-- Checkout Form & Calculator -->
+                <div class="grid md:grid-cols-12 gap-8 pt-6 border-t border-classic-border">
+                    <div class="md:col-span-7 space-y-4">
+                        <h3 class="font-display text-xl font-bold text-classic-text">פרטי הזמנה ואיסוף / משלוח</h3>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <input id="cust-name" type="text" placeholder="שם מלא *" class="w-full px-4 py-3 rounded-xl border border-peach-200 bg-peach-50/40 text-sm outline-none focus:border-plum-500">
+                            <input id="cust-phone" type="tel" placeholder="טלפון נייד *" class="w-full px-4 py-3 rounded-xl border border-peach-200 bg-peach-50/40 text-sm outline-none focus:border-plum-500">
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <select id="delivery-method" onchange="updateSummary()" class="w-full px-4 py-3 rounded-xl border border-peach-200 bg-white text-sm outline-none focus:border-plum-500 font-medium">
+                                <option value="pickup">איסוף עצמי: נווה שאנן, חיפה (חינם בתיאום)</option>
+                                <option value="shipping">משלוח עד הבית (+30 ₪)</option>
+                            </select>
+                            <input id="cust-address" type="text" placeholder="עיר וכתובת (לבוחרים במשלוח)" class="w-full px-4 py-3 rounded-xl border border-peach-200 bg-peach-50/40 text-sm outline-none focus:border-plum-500">
+                        </div>
+
+                        <!-- Gift Option Checkbox -->
+                        <div class="bg-mint-50 border border-mint-200 rounded-xl p-3.5 space-y-2">
+                            <label class="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm font-semibold text-classic-text">
+                                <input id="is-gift-checkbox" type="checkbox" onchange="toggleGiftBox()" class="w-4 h-4 accent-plum-600 rounded cursor-pointer">
+                                <span>🎁 זו מתנה עבור מישהו אהוב? (נצרף פתק הקדשה ללא עלות וללא ציון מחיר בחבילה)</span>
+                            </label>
+                            <input id="gift-message" type="text" placeholder="כתבו כאן מה תרצו שנרשום בפתק המתנה..." class="hidden w-full px-3.5 py-2 rounded-lg border border-mint-300 bg-white text-xs outline-none focus:border-plum-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label for="cust-notes" class="block text-xs font-bold text-plum-700">
+                                <i class="fa-solid fa-pen-fancy ml-1"></i> מזמינים מזכרות לאירועים? כתבו כאן בהערות את נוסח ההקדשה שתרצו על המגנט (נשלח אליכם לוואטסאפ לאישור לפני ההדפסה):
+                            </label>
+                            <textarea id="cust-notes" rows="2" placeholder="כתבו כאן את ההקדשה למזכרות לאירועים (יישלח אליכם לאישור בוואטסאפ לפני ההדפסה) או כל הערה נוספת..." class="w-full px-4 py-2.5 rounded-xl border border-peach-300 bg-peach-50/40 text-sm outline-none focus:border-plum-500"></textarea>
+                        </div>
+                        <div class="bg-peach-100 border border-peach-300 rounded-xl p-3.5 text-xs text-classic-text flex items-center gap-2.5">
+                            <i class="fa-solid fa-shield-heart text-plum-600 text-base"></i>
+                            <span><strong>אמצעי תשלום:</strong> התשלום מתבצע בקלות דרך <strong>ביט (Bit)</strong> לאחר שליחת ההזמנה בוואטסאפ.</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-5 bg-plum-100/70 p-6 rounded-2xl border-2 border-plum-200 flex flex-col justify-between">
+                        <div class="space-y-3 text-sm">
+                            <h4 class="font-display font-bold text-lg text-classic-text border-b border-plum-200 pb-2">סיכום הזמנה</h4>
+                            
+                            <div class="flex justify-between items-center">
+                                <span>מגנטים מהנייד (10×15):</span>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="adjustCount(-1)" class="w-7 h-7 rounded bg-white border border-plum-300 hover:bg-peach-100 font-bold">-</button>
+                                    <span id="summary-count" class="font-bold text-base w-6 text-center">10</span>
+                                    <button onclick="adjustCount(1)" class="w-7 h-7 rounded bg-white border border-plum-300 hover:bg-peach-100 font-bold">+</button>
+                                </div>
+                            </div>
+
+                            <div id="summary-wood-row" class="hidden flex justify-between items-center text-classic-text bg-white/70 px-2.5 py-1.5 rounded-lg">
+                                <span>בלוקי עץ (<span id="summary-wood-count">0</span> יח'):</span>
+                                <span id="summary-wood-price" class="font-bold">0 ₪</span>
+                            </div>
+
+                            <div id="summary-souv-row" class="hidden flex justify-between items-center text-classic-text bg-white/70 px-2.5 py-1.5 rounded-lg">
+                                <span>מזכרות לאירועים (<span id="summary-souv-count">0</span> יח'):</span>
+                                <span id="summary-souv-price" class="font-bold">0 ₪</span>
+                            </div>
+
+                            <!-- Coupon Code Input Box -->
+                            <div class="pt-2 border-t border-plum-200/70">
+                                <label for="coupon-input" class="block text-xs font-bold text-classic-text mb-1.5">
+                                    <i class="fa-solid fa-ticket text-plum-600 ml-1"></i> יש לכם קוד קופון?
+                                </label>
+                                <div class="flex gap-2">
+                                    <input id="coupon-input" type="text" placeholder="הקלידו קוד קופון..." onkeydown="if(event.key==='Enter'){event.preventDefault(); applyCoupon();}" class="w-full px-3 py-1.5 rounded-xl border border-plum-300 bg-white text-xs outline-none focus:border-plum-600">
+                                    <button type="button" onclick="applyCoupon()" class="bg-plum-600 hover:bg-plum-700 text-white text-xs font-semibold px-4 py-1.5 rounded-xl transition shrink-0 shadow-sm">
+                                        הפעל
+                                    </button>
+                                </div>
+                                <p id="coupon-msg" class="text-xs mt-1 font-semibold hidden"></p>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <span class="text-classic-muted">איסוף / משלוח:</span>
+                                <span id="summary-delivery" class="font-medium">איסוף מנווה שאנן, חיפה (0 ₪)</span>
+                            </div>
+                            <div class="flex justify-between text-mint-700 font-bold bg-mint-100/70 px-2.5 py-1 rounded-lg">
+                                <span>סה"כ חיסכון חבילות וכמות:</span>
+                                <span id="summary-discount">-15 ₪</span>
+                            </div>
+                            <div id="summary-coupon-row" class="hidden flex justify-between text-plum-700 font-bold bg-mint-100/90 px-2.5 py-1 rounded-lg border border-mint-300">
+                                <span>הנחת קופון (tirza1 - 10%):</span>
+                                <span id="summary-coupon-discount">-0 ₪</span>
+                            </div>
+                            <div class="flex justify-between pt-3 border-t border-plum-200 font-bold text-lg items-baseline">
+                                <span>סה"כ לתשלום בביט:</span>
+                                <span id="summary-total" class="text-plum-700 text-3xl font-display font-bold">65 ₪</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-2.5 border-t border-plum-200/60">
+                            <!-- Subtle 1-line Terms Confirmation -->
+                            <label class="flex items-start gap-2 cursor-pointer text-[11px] text-classic-muted leading-snug select-none mb-2.5">
+                                <input id="terms-checkbox" type="checkbox" checked onchange="document.getElementById('terms-error').classList.add('hidden')" class="mt-0.5 w-3.5 h-3.5 accent-plum-600 rounded cursor-pointer shrink-0">
+                                <span>שליחת ההזמנה מהווה אישור ל<button type="button" onclick="openLegalModal('terms')" class="underline hover:text-plum-700 font-semibold">תקנון האתר</button> (הדפסה בהתאמה אישית).</span>
+                            </label>
+                            <p id="terms-error" class="hidden text-[11px] text-red-600 font-bold mb-2">נא לסמן אישור לתקנון האתר לפני השליחה</p>
+
+                            <button onclick="submitOrder()" class="w-full bg-plum-600 hover:bg-plum-700 text-white font-semibold py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fa-brands fa-whatsapp text-xl"></i>
+                                <span>שליחת הזמנה בוואטסאפ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-14 bg-gradient-to-b from-peach-50 via-plum-50 to-mint-50 border-t border-classic-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="bg-plum-100 border border-plum-200 text-classic-text font-semibold text-xs px-4 py-1 rounded-full inline-block mb-2">לקוחות משתפים</span>
+                <h2 class="font-display text-3xl font-bold text-classic-text">אין כמו ההתרגשות כשזה מגיע</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 items-start">
+                <div class="bg-peach-100/90 p-5 rounded-3xl border-2 border-peach-200 shadow-sm">
+                    <div class="flex items-center gap-3 pb-3 border-b border-peach-200 mb-3">
+                        <div class="w-9 h-9 rounded-full bg-white text-plum-700 flex items-center justify-center font-bold text-sm">מ</div>
+                        <div>
+                            <h4 class="font-bold text-classic-text text-sm">מיכל</h4>
+                            <span class="text-xs text-classic-muted">הזמינה חבילת 50</span>
+                        </div>
+                        <i class="fa-brands fa-whatsapp text-mint-700 text-xl mr-auto"></i>
+                    </div>
+                    <div class="whatsapp-bubble p-3 text-sm text-classic-text">
+                        שנים שהתמונות סתם שכבו לי בגלריה בנייד! בזכותך כל הזיכרונות והחוויות הכי יפות שלנו קיבלו חיות ונמצאים מול העיניים כל יום על הדלת. הצבעים חדים בטירוף והגודל 10 על 15 פשוט בול! ✨
+                    </div>
+                </div>
+
+                <div class="bg-plum-100/90 p-5 rounded-3xl border-2 border-plum-200 shadow-sm">
+                    <div class="flex items-center gap-3 pb-3 border-b border-plum-200 mb-3">
+                        <div class="w-9 h-9 rounded-full bg-white text-plum-700 flex items-center justify-center font-bold text-sm">ש</div>
+                        <div>
+                            <h4 class="font-bold text-classic-text text-sm">שירה</h4>
+                            <span class="text-xs text-classic-muted">הזמינה חבילת 25</span>
+                        </div>
+                        <i class="fa-brands fa-whatsapp text-mint-700 text-xl mr-auto"></i>
+                    </div>
+                    <div class="whatsapp-bubble p-3 text-sm text-classic-text">
+                        וואו המגנטים הגיעו והם פשוט מושלמים! תלינו על הדלת בכניסה לבית וכל פעם שאנחנו עוברים ליד זה פשוט כיף להיזכר בכל החוויות היפות שהיו לנו בטיולים. איכות הדפסה מטורפת, תודה רבה! ❤️
+                    </div>
+                </div>
+
+                <div class="bg-mint-100/90 p-5 rounded-3xl border-2 border-mint-200 shadow-sm">
+                    <div class="flex items-center gap-3 pb-3 border-b border-mint-200 mb-3">
+                        <div class="w-9 h-9 rounded-full bg-white text-mint-700 flex items-center justify-center font-bold text-sm">מ</div>
+                        <div>
+                            <h4 class="font-bold text-classic-text text-sm">מעיין</h4>
+                            <span class="text-xs text-classic-muted">מתנה לסבא וסבתא</span>
+                        </div>
+                        <i class="fa-brands fa-whatsapp text-mint-700 text-xl mr-auto"></i>
+                    </div>
+                    <div class="whatsapp-bubble p-3 text-sm text-classic-text">
+                        הזמנתי מתנה לסבא וסבתא ועוד חבילה לנו הביתה. יצא מרגש ברמות! הילדים עפים עליהם כל בוקר, איזה כיף להוציא את התמונות מהטלפון ולהיזכר בחיוכים ובחוויות המשפחתיות שלנו. 🌸
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-14 bg-white border-t border-classic-border">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-10">
+                <span class="bg-peach-100 text-plum-700 font-semibold text-xs px-3.5 py-1 rounded-full border border-peach-200">טוב לדעת לפני שמזמינים</span>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold text-classic-text mt-2">שאלות נפוצות</h2>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-5 text-sm">
+                <div class="bg-peach-50/70 p-5 rounded-2xl border border-peach-200">
+                    <h3 class="font-display font-bold text-base text-classic-text mb-1.5">✨ איך בוחרים ומעלים כמה תמונות יחד מהנייד?</h3>
+                    <p class="text-classic-muted leading-relaxed">מסמנים בלב (מועדפים) את התמונות שאוהבים בגלריה בנייד, נכנסים לתיקיית "מועדפים" ובוחרים את כל התמונות יחד בלחיצה אחת פשוטה.</p>
+                </div>
+                <div class="bg-plum-50/70 p-5 rounded-2xl border border-plum-200">
+                    <h3 class="font-display font-bold text-base text-classic-text mb-1.5">📏 מה הגודל של המגנטים שלכם?</h3>
+                    <p class="text-classic-muted leading-relaxed">כל המגנטים שלנו מודפסים בגודל 10×15 ס"מ – גודל של תמונת אלבום/גלויה מלאה (פי 2 ממגנט כיס קטן), כך שרואים כל חיוך בבירור מרחוק.</p>
+                </div>
+                <div class="bg-mint-50/70 p-5 rounded-2xl border border-mint-200">
+                    <h3 class="font-display font-bold text-base text-classic-text mb-1.5">💌 איך מאשרים את ההקדשה למזכרות לאירועים?</h3>
+                    <p class="text-classic-muted leading-relaxed">כותבים בשדה ההערות את נוסח ההקדשה שרוצים. לפני שאנחנו מדפיסים, אנחנו שולחים לכם סקיצה מעוצבת לוואטסאפ לאישור סופי שלכם.</p>
+                </div>
+                <div class="bg-peach-50/70 p-5 rounded-2xl border border-peach-200">
+                    <h3 class="font-display font-bold text-base text-classic-text mb-1.5">📱 איך שולחים את התמונות להדפסה?</h3>
+                    <p class="text-classic-muted leading-relaxed">מעלים את התמונות כאן בעמוד כדי לחשב אוטומטית את החבילה המשתלמת עבורכם, ובלחיצה על כפתור ההזמנה שולחים אותן בקלות בוואטסאפ.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer with Rectangular Image Placeholder for Logo & Subtle Legal Links -->
+    <footer class="bg-[#231915] text-peach-100 py-10 text-center text-xs">
+        <div class="max-w-6xl mx-auto px-4 space-y-3">
+            <div class="flex justify-center">
+                <!-- מלבן לשיבוץ תמונת הלוגו בפוטר (על רקע לבן נקי שמתאים ללוגו החדש) -->
+                <label id="footer-logo-container" title="לחצו לבחירת תמונת לוגו" class="cursor-pointer w-40 sm:w-48 h-16 sm:h-20 rounded-xl border-2 border-dashed border-[#D5A992]/60 bg-white hover:bg-peach-50 flex items-center justify-center overflow-hidden transition">
+                    <input type="file" accept="image/*" class="hidden" onchange="if(this.files[0]) setLogoImage(this.files[0])">
+                    <img id="footer-logo-img" src="שנשארים_2.jpg" alt="רגעים שנשארים" class="w-full h-full object-contain hidden" onload="showLoadedLogo('footer')" onerror="tryNextLogoFallback(this, 'footer')">
+                    <span id="footer-logo-placeholder" class="text-[11px] font-semibold text-plum-600 text-center px-2 leading-tight select-none">
+                        <i class="fa-regular fa-image block text-sm mb-0.5"></i>
+                        שיבוץ תמונת לוגו
+                    </span>
+                </label>
+            </div>
+            <p class="text-peach-100">נותנים חיות לתמונות מהנייד • מגנטים בגודל 10×15 ס"מ • הדפסה על בלוק עץ • מזכרות לאירועים</p>
+            <p class="text-peach-200/80">איסוף עצמי בתיאום מנווה שאנן, חיפה | משלוחים לכל הארץ (30 ₪) | להזמנות בוואטסאפ: 058-6701402</p>
+            
+            <!-- Subtle Legal & Accessibility Modal Triggers -->
+            <div class="pt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] text-peach-200/70">
+                <button type="button" onclick="openLegalModal('terms')" class="hover:text-white underline transition">תקנון האתר ומדיניות ביטולים</button>
+                <span>•</span>
+                <button type="button" onclick="openLegalModal('accessibility')" class="hover:text-white underline transition">הצהרת נגישות (עוסק זעיר) ופרטיות</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================================================= -->
+    <!-- SUBTLE POP-UP MODALS FOR TERMS & ACCESSIBILITY (Hidden by default)        -->
+    <!-- ========================================================================= -->
+    <div id="legal-modal-backdrop" onclick="closeLegalModal(event)" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div onclick="event.stopPropagation()" class="bg-white rounded-3xl max-w-xl w-full max-h-[82vh] flex flex-col shadow-2xl border border-peach-200 overflow-hidden fade-in">
+            <div class="px-6 py-4 bg-peach-50 border-b border-peach-200 flex items-center justify-between">
+                <h3 id="legal-modal-title" class="font-display font-bold text-lg text-classic-text"></h3>
+                <button type="button" onclick="closeLegalModal()" class="w-8 h-8 rounded-full bg-white border border-peach-200 text-classic-muted hover:text-classic-text flex items-center justify-center font-bold">✕</button>
+            </div>
+            <div id="legal-modal-body" class="p-6 overflow-y-auto text-xs sm:text-sm text-classic-text space-y-3.5 leading-relaxed custom-scrollbar text-right">
+            </div>
+            <div class="px-6 py-3 bg-peach-50/60 border-t border-peach-200 text-left">
+                <button type="button" onclick="closeLegalModal()" class="bg-plum-600 hover:bg-plum-700 text-white text-xs font-semibold px-5 py-2 rounded-full transition">סגירה</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let customerPhotos = [];
+        let manualCount = 10;
+        let activeCoupon = false;
+
+        let woodBlocks = {
+            '10x15': { qty: 0, singlePrice: 28, bulkPrice: 22 },
+            '15x15': { qty: 0, singlePrice: 38, bulkPrice: 32 },
+            '15x20': { qty: 0, singlePrice: 48, bulkPrice: 40 }
+        };
+
+        let souvenirs = {};
+
+        // Auto-detects logo file in GitHub repository (supports שנשארים_2.jpg, שנשארים.jpg, רגעים.jpg, logo.jpg, logo.png)
+        const logoFallbacks = ['שנשארים.jpg', 'רגעים.jpg', 'logo.jpg', 'logo.png'];
+        let logoFallbackIdx = { header: 0, footer: 0 };
+
+        function showLoadedLogo(loc) {
+            const img = document.getElementById(loc + '-logo-img');
+            const ph = document.getElementById(loc + '-logo-placeholder');
+            const box = document.getElementById(loc === 'header' ? 'brand-logo-container' : 'footer-logo-container');
+            img.classList.remove('hidden');
+            ph.classList.add('hidden');
+            box.classList.remove('border-dashed', 'border-2');
+        }
+
+        function tryNextLogoFallback(imgEl, loc) {
+            const idx = logoFallbackIdx[loc]++;
+            if (idx < logoFallbacks.length) {
+                imgEl.src = logoFallbacks[idx];
+            } else {
+                imgEl.classList.add('hidden');
+                document.getElementById(loc + '-logo-placeholder').classList.remove('hidden');
+            }
+        }
+
+        // Displays the user's logo image directly inside the header and footer rectangles
+        function setLogoImage(file) {
+            const url = URL.createObjectURL(file);
+            const headerImg = document.getElementById('header-logo-img');
+            const footerImg = document.getElementById('footer-logo-img');
+
+            headerImg.src = url;
+            showLoadedLogo('header');
+
+            footerImg.src = url;
+            showLoadedLogo('footer');
+        }
+
+        function openLegalModal(type) {
+            const backdrop = document.getElementById('legal-modal-backdrop');
+            const title = document.getElementById('legal-modal-title');
+            const body = document.getElementById('legal-modal-body');
+
+            if (type === 'terms') {
+                title.textContent = 'תקנון האתר ומדיניות ביטולים – רגעים שנשארים';
+                body.innerHTML = `
+                    <p><strong>1. מוצרים בהתאמה אישית ומדיניות ביטולים:</strong> בהתאם לסעיף 14ג(ד)(4) לחוק הגנת הצרכן, התשמ"א-1981, מוצרי האתר (מגנטים מתמונות אישיות, הדפסה על בלוקי עץ ומזכרות לאירועים עם הקדשה אישית) מיוצרים במיוחד עבור הלקוח לפי הזמנתו. לפיכך, לא ניתן לבטל את העסקה, להחזיר או לקבל החזר כספי לאחר שהחל תהליך ההפקה וההדפסה. ביטול עסקה יתאפשר ללא עלות כל עוד הלקוח עדכן בוואטסאפ טרם תחילת ההדפסה בפועל.</p>
+                    <p><strong>2. איכות תמונות, צבעים והתאמת פרופורציות:</strong> ההדפסה מתבצעת על בסיס הקבצים שנשלחו על ידי הלקוח. העסק אינו אחראי לתוצאה הנובעת משליחת תמונות ברזולוציה נמוכה, תמונות חשוכות או צילומי מסך. ייתכנו הבדלי גוונים קלים בין תצוגת המסך המואר בטלפון הנייד לבין תוצאת ההדפסה הפיזית. לשם התאמת התמונה לפורמט המוצר (10×15 ס"מ או בלוק מרובע 15×15 ס"מ) ייתכן חיתוך קל בשולי התמונה.</p>
+                    <p><strong>3. מאפייני בלוק עץ טבעי:</strong> בלוקי העץ מיוצרים מעץ טבעי, ולפיכך ייתכנו הבדלים קלים בגוון העץ, בטקסטורה, בסיבים או ב"עיניים" הטבעיות של העץ, וכן סטייה קלה של עד כ-1 ס"מ במידות החיתוך. מאפיינים אלו הם חלק מהמראה הטבעי של המוצר ואינם מהווים פגם.</p>
+                    <p><strong>4. אישור סקיצה למזכרות לאירועים:</strong> בהזמנת מזכרות עם הקדשה אישית, נשלחת ללקוח סקיצה לאישור בוואטסאפ לפני הדפסה. באחריות הלקוח לבדוק היטב את הנוסח, האיות והתאריכים. לאחר אישור הסקיצה בוואטסאפ על ידי הלקוח, לא ניתן יהיה לבוא בטענה בגין טעויות הגהה או נוסח.</p>
+                    <p><strong>5. איסוף עצמי ומשלוחים:</strong> איסוף עצמי מתבצע מנווה שאנן, חיפה בתיאום מראש ללא עלות. משלוח עד הבית (30 ₪) מתבצע באמצעות חברת שליחויות חיצונית (לרוב תוך 3–7 ימי עסקים ממועד מוכנות ההזמנה, וייתכנו עיכובים ביישובים מרוחקים או בתקופות עומס). במקרה של פגם פיזי שמקורו בייצור, יש לעדכן אותנו בוואטסאפ בתוך 48 שעות מקבלת ההזמנה בצירוף תמונה, ונדאג להדפסה חוזרת.</p>
+                    <p><strong>6. זכויות יוצרים:</strong> הלקוח מצהיר כי הוא בעל מלוא הזכויות בתמונות שהוא שולח להדפסה וכי אין בהדפסתן משום הפרת זכויות יוצרים או פרטיות של צד שלישי.</p>
+                `;
+            } else {
+                title.textContent = 'הצהרת נגישות (עוסק זעיר) ומדיניות פרטיות';
+                body.innerHTML = `
+                    <p><strong>הצהרת נגישות – עוסק זעיר:</strong> אנו ב"רגעים שנשארים" רואים חשיבות רבה במתן שירות מכבד, שוויוני ונגיש לכלל הלקוחות, לרבות אנשים עם מוגבלות.</p>
+                    <p>העסק מוגדר ופועל כ<strong>עוסק זעיר</strong>, ולפיכך פטור מביצוע התאמות נגישות טכנולוגיות מלאות באתר האינטרנט בהתאם לתקנה 35ז לתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג-2013.</p>
+                    <p>יחד עם זאת, האתר נבנה בצורה בהירה, קריאה ונוחה לתפעול בנייד ובמחשב. לקוחות המעוניינים בסיוע אישי בבחירת החבילה או בשליחת התמונות מוזמנים לפנות אלינו ישירות בוואטסאפ או בטלפון <strong>058-6701402</strong> ונשמח ללוות אתכם אישית בכל שלב.</p>
+                    <p><strong>הסדרי נגישות באיסוף עצמי (נווה שאנן, חיפה):</strong> האיסוף מתבצע בתיאום מראש. לקוחות עם מוגבלות בניידות יכולים לתאם מסירה נגישה ישירות עד לרכב בחזית הרחוב ללא צורך בעלייה במדרגות.</p>
+                    <hr class="border-peach-200 my-2">
+                    <p><strong>מדיניות פרטיות:</strong> התמונות ופרטי ההתקשרות שנשלחים על ידי הלקוח משמשים אך ורק לצורך הפקת ההזמנה, תיאום האיסוף או מסירת המשלוח לחברת השליחויות. התמונות האישיות של הלקוחות לעולם אינן מפורסמות באתר או ברשתות החברתיות ואינן מועברות לשום גורם שלישי ללא אישור מפורש מראש של הלקוח. העסק אינו שולח הודעות פרסומיות (ספאם) ללא הסכמת הלקוח.</p>
+                `;
+            }
+
+            backdrop.classList.remove('hidden');
+        }
+
+        function closeLegalModal() {
+            document.getElementById('legal-modal-backdrop').classList.add('hidden');
+        }
+
+        function toggleGiftBox() {
+            const isGift = document.getElementById('is-gift-checkbox').checked;
+            const giftInput = document.getElementById('gift-message');
+            if (isGift) giftInput.classList.remove('hidden');
+            else giftInput.classList.add('hidden');
+        }
+
+        function applyCoupon() {
+            const input = document.getElementById('coupon-input').value.trim().toLowerCase();
+            const msg = document.getElementById('coupon-msg');
+            msg.classList.remove('hidden');
+
+            if (input === 'tirza1') {
+                activeCoupon = true;
+                msg.textContent = '✓ קוד הקופון tirza1 הופעל בהצלחה! (10% הנחה)';
+                msg.className = 'text-xs mt-1 font-bold text-mint-700';
+            } else if (input === '') {
+                activeCoupon = false;
+                msg.classList.add('hidden');
+            } else {
+                activeCoupon = false;
+                msg.textContent = '✗ קוד קופון לא תקין';
+                msg.className = 'text-xs mt-1 font-bold text-red-600';
+            }
+            updateSummary();
+        }
+
+        function switchCategory(cat) {
+            const categories = ['magnets', 'wood', 'souvenirs'];
+            categories.forEach(c => {
+                const page = document.getElementById(`category-page-${c}`);
+                const card = document.getElementById(`cat-card-${c}`);
+                const navBtn = document.getElementById(`nav-btn-${c}`);
+
+                if (c === cat) {
+                    page.classList.remove('hidden');
+                    card.classList.add('active-cat');
+                    if (navBtn) navBtn.className = 'px-4 py-2 rounded-full bg-plum-600 text-white transition';
+                } else {
+                    page.classList.add('hidden');
+                    card.classList.remove('active-cat');
+                    if (navBtn) navBtn.className = 'px-4 py-2 rounded-full text-classic-text hover:bg-peach-100 transition';
+                }
+            });
+        }
+
+        function changeWood(size, delta) {
+            woodBlocks[size].qty = Math.max(0, woodBlocks[size].qty + delta);
+            document.getElementById(`wood-qty-${size}`).textContent = woodBlocks[size].qty;
+            updateSummary();
+        }
+
+        function setSouvenirPkg(name, count) {
+            if (!souvenirs[name]) souvenirs[name] = { qty: 0 };
+            souvenirs[name].qty = count;
+            const el = document.getElementById(`souv-qty-${name}`);
+            if (el) el.textContent = count;
+            updateSummary();
+        }
+
+        function stepSouvenir(name, delta) {
+            if (!souvenirs[name]) souvenirs[name] = { qty: 0 };
+            let current = souvenirs[name].qty;
+            if (delta > 0) current = current === 0 ? 20 : current + delta;
+            else current = current <= 20 ? 0 : current + delta;
+            souvenirs[name].qty = current;
+            const el = document.getElementById(`souv-qty-${name}`);
+            if (el) el.textContent = current;
+            updateSummary();
+        }
+
+        function handleCustomerUpload(files) {
+            Array.from(files).forEach(file => {
+                customerPhotos.push({ src: URL.createObjectURL(file), copies: 1 });
+            });
+            renderCustomerPhotos();
+            updateSummary();
+        }
+
+        function renderCustomerPhotos() {
+            const container = document.getElementById('preview-container');
+            const grid = document.getElementById('photos-grid');
+            if (customerPhotos.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
+            grid.innerHTML = customerPhotos.map((p, idx) => `
+                <div class="bg-peach-50 p-2 rounded-2xl border border-peach-200 shadow-sm relative">
+                    <img src="${p.src}" class="w-full aspect-[3/4] object-cover rounded-xl mb-2">
+                    <div class="flex items-center justify-between px-1 text-xs">
+                        <span class="font-semibold">עותקים:</span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="changeCopies(${idx}, -1)" class="w-5 h-5 rounded bg-white border border-peach-200 font-bold">-</button>
+                            <span class="font-bold">${p.copies}</span>
+                            <button onclick="changeCopies(${idx}, 1)" class="w-5 h-5 rounded bg-peach-200 text-classic-text font-bold">+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeCopies(index, delta) {
+            customerPhotos[index].copies += delta;
+            if (customerPhotos[index].copies <= 0) customerPhotos.splice(index, 1);
+            renderCustomerPhotos();
+            updateSummary();
+        }
+
+        function clearCustomerPhotos() {
+            customerPhotos = [];
+            renderCustomerPhotos();
+            updateSummary();
+        }
+
+        function selectPackage(count) {
+            manualCount = count;
+            document.getElementById('order-area').scrollIntoView({ behavior: 'smooth' });
+            updateSummary();
+        }
+
+        function adjustCount(delta) {
+            if (customerPhotos.length > 0) return;
+            manualCount = Math.max(0, manualCount + delta);
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const uploadedTotal = customerPhotos.reduce((sum, p) => sum + p.copies, 0);
+            const count = uploadedTotal > 0 ? uploadedTotal : manualCount;
+
+            let unitPrice = 8;
+            if (count >= 50) unitPrice = 5;
+            else if (count >= 25) unitPrice = 5.4;
+            else if (count >= 10) unitPrice = 6.5;
+
+            const magnetsTotal = Math.round(count * unitPrice);
+            const magnetsOriginal = count * 8;
+            const magnetsDiscount = magnetsOriginal - magnetsTotal;
+
+            const totalWoodCount = Object.values(woodBlocks).reduce((sum, item) => sum + item.qty, 0);
+            const isWoodBulk = totalWoodCount >= 3;
+            const rawWoodPrice = Object.values(woodBlocks).reduce((sum, item) => sum + (item.qty * item.singlePrice), 0);
+            const finalWoodPrice = Object.values(woodBlocks).reduce((sum, item) => sum + (item.qty * (isWoodBulk ? item.bulkPrice : item.singlePrice)), 0);
+            const woodDiscount = rawWoodPrice - finalWoodPrice;
+
+            const totalSouvCount = Object.values(souvenirs).reduce((sum, item) => sum + item.qty, 0);
+            const souvUnitPrice = totalSouvCount >= 50 ? 4.8 : 6;
+            const finalSouvPrice = Math.round(totalSouvCount * souvUnitPrice);
+            const souvOriginal = totalSouvCount * 8;
+            const souvDiscount = totalSouvCount > 0 ? (souvOriginal - finalSouvPrice) : 0;
+
+            const woodRow = document.getElementById('summary-wood-row');
+            if (totalWoodCount > 0) {
+                woodRow.classList.remove('hidden');
+                document.getElementById('summary-wood-count').textContent = totalWoodCount;
+                document.getElementById('summary-wood-price').textContent = finalWoodPrice + ' ₪' + (isWoodBulk ? ' (מחיר סט!)' : '');
+            } else woodRow.classList.add('hidden');
+
+            const souvRow = document.getElementById('summary-souv-row');
+            if (totalSouvCount > 0) {
+                souvRow.classList.remove('hidden');
+                document.getElementById('summary-souv-count').textContent = totalSouvCount;
+                document.getElementById('summary-souv-price').textContent = finalSouvPrice + ' ₪';
+            } else souvRow.classList.add('hidden');
+
+            const productsSubtotal = magnetsTotal + finalWoodPrice + finalSouvPrice;
+            const couponDiscount = activeCoupon ? Math.round(productsSubtotal * 0.10) : 0;
+
+            const couponRow = document.getElementById('summary-coupon-row');
+            if (activeCoupon && couponDiscount > 0) {
+                couponRow.classList.remove('hidden');
+                document.getElementById('summary-coupon-discount').textContent = '-' + couponDiscount + ' ₪';
+            } else couponRow.classList.add('hidden');
+
+            const isShipping = document.getElementById('delivery-method').value === 'shipping';
+            const shipping = isShipping ? 30 : 0;
+            const totalDiscount = magnetsDiscount + woodDiscount + souvDiscount;
+            const grandTotal = (productsSubtotal - couponDiscount) + shipping;
+
+            document.getElementById('summary-count').textContent = count;
+            document.getElementById('summary-delivery').textContent = isShipping ? 'משלוח עד הבית (30 ₪)' : 'איסוף מנווה שאנן, חיפה (0 ₪)';
+            document.getElementById('summary-discount').textContent = (totalDiscount > 0 ? '-' + totalDiscount : '0') + ' ₪';
+            document.getElementById('summary-total').textContent = grandTotal + ' ₪';
+            document.getElementById('header-total-badge').textContent = grandTotal + ' ₪';
+
+            document.getElementById('tier-badge').textContent = `מחיר מגנט ליחידה: ${unitPrice} ₪`;
+            const upsell = document.getElementById('upsell-text');
+            if (count < 10) upsell.innerHTML = `בחרתם ${count} מגנטים (8 ₪ ליח'). הוסיפו עוד <strong>${10 - count}</strong> מגנטים ותיכנסו ל<strong>חבילת ה-10 ב-65 ₪ בלבד (6.5 ₪ למגנט)</strong>!`;
+            else if (count < 25) upsell.innerHTML = `אתם בחבילת ה-10+ (6.5 ₪ למגנט). הוסיפו עוד <strong>${25 - count}</strong> מגנטים כדי לרדת ל-<strong>5.4 ₪ למגנט (חבילת 25 ב-135 ₪)</strong>!`;
+            else if (count < 50) upsell.innerHTML = `אתם בחבילת ה-25+ (5.4 ₪ למגנט). הוסיפו עוד <strong>${50 - count}</strong> מגנטים ותקבלו <strong>5 ₪ למגנט (חבילת 50 ב-250 ₪)</strong>!`;
+            else upsell.innerHTML = `הגעתם לחבילת ה-50+ המשתלמת ביותר – <strong>5 ₪ למגנט</strong> (חיסכון של ${magnetsDiscount} ₪ על המגנטים)!`;
+        }
+
+        function submitOrder() {
+            const termsChecked = document.getElementById('terms-checkbox').checked;
+            if (!termsChecked) {
+                document.getElementById('terms-error').classList.remove('hidden');
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim() || 'לקוח/ה';
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const notes = document.getElementById('cust-notes').value.trim();
+            const isGift = document.getElementById('is-gift-checkbox').checked;
+            const giftMsg = document.getElementById('gift-message').value.trim();
+            const isShipping = document.getElementById('delivery-method').value === 'shipping';
+            const deliveryText = isShipping ? `משלוח עד הבית (+30 ₪) לכתובת: ${address || 'לא הוזנה'}` : 'איסוף עצמי בתיאום מנווה שאנן, חיפה';
+            const count = document.getElementById('summary-count').textContent;
+            const total = document.getElementById('summary-total').textContent;
+            const couponDiscountText = document.getElementById('summary-coupon-discount').textContent;
+
+            const woodDetails = Object.entries(woodBlocks).filter(([_, data]) => data.qty > 0).map(([size, data]) => `${size} ס"מ (${data.qty} יח')`).join(', ');
+            const souvDetails = Object.entries(souvenirs).filter(([_, data]) => data.qty > 0).map(([title, data]) => `${title} (${data.qty} יח')`).join(', ');
+
+            let orderLines = `היי "רגעים שנשארים"! ❤️\nאשמח לבצע הזמנה:\n`;
+            orderLines += `• שם: ${name}\n`;
+            orderLines += `• טלפון: ${phone}\n`;
+            if (parseInt(count) > 0) orderLines += `• מגנטים מהנייד (10×15): ${count} יח'\n`;
+            if (woodDetails) orderLines += `• הדפסה על בלוק עץ: ${woodDetails}\n`;
+            if (souvDetails) orderLines += `• מזכרות לאירועים: ${souvDetails}\n`;
+            if (activeCoupon) orderLines += `• קוד קופון מופעל: tirza1 (10% הנחה: ${couponDiscountText})\n`;
+            if (isGift) orderLines += `• 🎁 אריזת מתנה (ללא מחיר בחבילה) + פתק הקדשה: "${giftMsg || 'ללא כיתוב'}"\n`;
+            orderLines += `• קבלת ההזמנה: ${deliveryText}\n`;
+            orderLines += `• סה"כ לתשלום (בביט): ${total}\n`;
+            if (notes) orderLines += `• הקדשה למזכרות / הערות (אשמח לקבל סקיצה לאישור לפני הדפסה): ${notes}\n`;
+            orderLines += `• ✓ מאשר/ת את תקנון האתר (הדפסה בהתאמה אישית)\n`;
+            orderLines += `\nשולח/ת לכאן עכשיו את התמונות שסימנתי בלב בגלריה!`;
+
+            const text = encodeURIComponent(orderLines);
+            window.open(`https://wa.me/972586701402?text=${text}`, '_blank');
+        }
+
+        updateSummary();
+    </script>
+</body>
+</html>
